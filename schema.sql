@@ -15,8 +15,9 @@ create table clients (
   nom text not null,
   email text,
   type_client text,
-  statut text,
-  deadline date
+  statut text default 'en_cours',
+  deadline date,
+  created_at timestamptz not null default now()
 );
 
 create table documents (
@@ -27,7 +28,11 @@ create table documents (
   fichier_url text
 );
 
+-- Migration si la table existe déjà :
+-- alter table clients add column if not exists created_at timestamptz not null default now();
+
 create index idx_clients_comptable_id on clients (comptable_id);
+create index idx_clients_created_at on clients (created_at desc);
 create index idx_documents_client_id on documents (client_id);
 
 alter table comptables enable row level security;
@@ -43,10 +48,17 @@ create policy "comptables_insert_own" on comptables
 create policy "comptables_update_own" on comptables
   for update using (auth.uid() = id);
 
-create policy "clients_all_own" on clients
-  for all using (
-    comptable_id in (select id from comptables where id = auth.uid())
-  );
+create policy "clients_select_own" on clients
+  for select using (comptable_id = auth.uid());
+
+create policy "clients_insert_own" on clients
+  for insert with check (comptable_id = auth.uid());
+
+create policy "clients_update_own" on clients
+  for update using (comptable_id = auth.uid());
+
+create policy "clients_delete_own" on clients
+  for delete using (comptable_id = auth.uid());
 
 create policy "documents_all_own" on documents
   for all using (

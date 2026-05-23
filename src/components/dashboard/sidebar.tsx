@@ -47,10 +47,7 @@ export function DashboardSidebar() {
           const isActive =
             href === "/dashboard"
               ? pathname === "/dashboard"
-              : href === "/dashboard/clients"
-                ? pathname === "/dashboard" ||
-                  pathname.startsWith("/dashboard/clients")
-                : pathname.startsWith(href);
+              : pathname.startsWith(href);
 
           return (
             <Link

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { ClientsView } from "@/components/dashboard/clients-view";
 
 export default function ClientsPage() {
-  redirect("/dashboard");
+  return <ClientsView />;
 }
